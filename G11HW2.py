@@ -50,7 +50,6 @@ def computeVectorX(fixed_a, fixed_b, alpha, beta, ell, k):
 
 
 def CentroidSelection(P: RDD, K: int) -> list[tuple]:
-    
     fixed_a = 0.0
     fixed_b = 0.0
     alpha   = [0.0] * K
@@ -59,33 +58,35 @@ def CentroidSelection(P: RDD, K: int) -> list[tuple]:
     mu_B    = [0.0] * K
     ell     = [0.0] * K
     
-    NA = P.map(lambda p: len([x for x in p[1] if x[-1] == 'A'])).reduce(lambda x, y: x + y)
-    NB = P.map(lambda p: len([x for x in p[1] if x[-1] == 'B'])).reduce(lambda x, y: x + y)
-    
-    
     def compute(X: list) -> tuple:
         count_A = len([x for x in X if x[-1] == 'A'])
         count_B = len([x for x in X if x[-1] == 'B'])
         mu_A    = mean_vector([x[:-1] for x in X if x[-1] == 'A'])
         mu_B    = mean_vector([x[:-1] for x in X if x[-1] == 'B'])
-        fixed_ai = sum(math.dist(x[:-1], mu_A) for x in X if x[-1] == 'A')
-        fixed_bi = sum(math.dist(x[:-1], mu_B) for x in X if x[-1] == 'B')
-        return count_A, count_B, mu_A, mu_B, fixed_ai, fixed_bi
+        ell     = math.dist(mu_A, mu_B)
+        fixed_a_part = sum(math.dist(x[:-1], mu_A) for x in X if x[-1] == 'A')
+        fixed_b_part = sum(math.dist(x[:-1], mu_B) for x in X if x[-1] == 'B')
+        return count_A, count_B, mu_A, mu_B, ell, fixed_a_part, fixed_b_part
     
-    data_from_ci = P.map(lambda p: (p[0], compute(p[1]))).collectAsMap() # {centroid: (count_A, count_B, mu_A, mu_B, fixed_ai, fixed_bi)}
+    P_data = (P.mapValues(lambda X: compute(X)) # [(centroid, (count_A, count_B, mu_A, mu_B, ell, fixed_a_part, fixed_b_part)),...]
+               .sortByKey()
+               .collect())
+    
+    NA = sum(P_data[i][1][0] for i in range(K))
+    NB = sum(P_data[i][1][1] for i in range(K))    
     
     for i in range(K):
                 
-        alpha[i] = data_from_ci[i][0] / NA if NA > 0 else 0.0
-        beta[i]  = data_from_ci[i][1] / NB if NB > 0 else 0.0
+        alpha[i] = P_data[i][1][0] / NA if NA > 0 else 0.0
+        beta[i]  = P_data[i][1][1] / NB if NB > 0 else 0.0
         
-        mu_A[i] = data_from_ci[i][2]
-        mu_B[i] = data_from_ci[i][3]
+        mu_A[i] = P_data[i][1][2]
+        mu_B[i] = P_data[i][1][3]
         
-        ell[i] = math.dist(mu_A[i], mu_B[i]) # TODO: check if i can compute it in RDD instead of here
+        ell[i] = P_data[i][1][4]
         
-        fixed_a += data_from_ci[i][4]
-        fixed_b += data_from_ci[i][5]
+        fixed_a += P_data[i][1][5]
+        fixed_b += P_data[i][1][6]
         
     fixed_a /= NA if NA > 0 else 1.0
     fixed_b /= NB if NB > 0 else 1.0
@@ -108,7 +109,7 @@ def MRFairLloyd(U: RDD, K: int, M: int) -> list[tuple]:
     # Compute initial set of centroids C using KMeans-parallel
     C = KMeans.train(U.map(lambda u: u[:-1]), K, maxIterations=0).clusterCenters
     
-    for _ in range(M):
+    for _ in range(M):        
         # Partition U into K clusters using set of centroids C
         P = (U.map       (lambda u: (dist(u[:-1], C)[0], u)) # [(centroid, point),...]
               .groupByKey())                                 # [(centroid, [point,...]),...]
