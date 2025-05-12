@@ -1,8 +1,8 @@
 import argparse
 import random
+#import os
 
-
-def main(N: int, K: int, D: int, A_group_ratio: float, A_centroid_ratio: float, val_min: float, val_max: float, std_dev: float):
+def main(N: int, K: int, output: str, D: int, A_group_ratio: float, A_centroid_ratio: float, val_min: float, val_max: float, std_dev: float):
     points = []
         
     NA = int(N * A_group_ratio)    # Number of points in group A
@@ -32,6 +32,17 @@ def main(N: int, K: int, D: int, A_group_ratio: float, A_centroid_ratio: float, 
     # Print the points
     for point in points:
         print(','.join(map(str, point)))
+
+    # Ensure the datasets directory exists
+    #os.makedirs('datasets', exist_ok=True)
+    #output_path = os.path.join('datasets', output)
+
+    # Write points to the output file
+    #with open(output_path, 'w') as f:
+    #    for point in points:
+    #        f.write(','.join(map(str, point)) + '\n')
+
+    #print(f"Generated {N} points and saved to: {output_path}")
     
 
 if __name__ == '__main__':
@@ -39,6 +50,7 @@ if __name__ == '__main__':
     parser.add_argument('N', type=int, help='Number of points')
     parser.add_argument('K', type=int, help='Number of centroids')
     # Optional arguments
+    #parser.add_argument('--output', type=str, default='output.csv', help='Output file path (default: output.csv)')
     parser.add_argument('--D', type=int, default=2, help='Number of dimensions (default: 2)')
     parser.add_argument('--A_group_ratio', type=float, default=0.9, help='Group A ratio (default: 0.9)')
     parser.add_argument('--A_centroid_ratio', type=float, default=0.5, help='Centroid A ratio (default: 0.5)')
@@ -48,3 +60,4 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
     main(args.N, args.K, args.D, args.A_group_ratio, args.A_centroid_ratio, args.val_min, args.val_max, args.std_dev)
+    #main(args.N, args.K, args.output, args.D, args.A_group_ratio, args.A_centroid_ratio, args.val_min, args.val_max, args.std_dev)
