@@ -1,5 +1,6 @@
 import argparse
 import math
+import time
 
 from typing import Iterable, Tuple, List
 from pyspark import RDD, SparkConf, SparkContext
@@ -191,6 +192,8 @@ def main(data_path, L, K, M):
     docs = sc.textFile(data_path).repartition(numPartitions=L).cache()
     input_points = docs.map(lambda x: [float(i) for i in x.split(',')[:-1]] + [x.split(',')[-1]]).cache()
 
+    # Force the two cached RDDs to materialise before the time mesurments
+    _ = docs.count()
     # Print N, NA, NB
     N = input_points.count()
     NA = input_points.filter(lambda x: x[-1] == 'A').count()
@@ -198,28 +201,28 @@ def main(data_path, L, K, M):
     print(f'N = {N}, NA = {NA}, NB = {NB}')
 
     # Compute standard centroids (no labels)
-    time_start = 0 # TODO: measure start time
+    time_start = time.perf_counter() # measure start time
     C_stand = KMeans.train(input_points.map(lambda x: x[:-1]), K, maxIterations=M).clusterCenters
-    time_end = 0   # TODO: measure end time
-    C_stand_time = time_end - time_start # TODO: must be in ms (integer)
+    time_end = time.perf_counter()   # measure end time
+    C_stand_time = int((time_end - time_start) * 1000) # must be in ms (integer)
     
     # Compute fair centroids (use labels)
-    time_start = 0 # TODO: measure start time
+    time_start = time.perf_counter() # measure start time
     C_fair = MRFairLloyd(input_points, K, M)
-    time_end = 0   # TODO: measure end time
-    C_fair_time = time_end - time_start # TODO: must be in ms (integer)
+    time_end = time.perf_counter()   # measure end time
+    C_fair_time = int((time_end - time_start) * 1000)  # must be in ms (integer)
 
     # Compute fair objective for standard centroids
-    time_start = 0 # TODO: measure start time
+    time_start = time.perf_counter() # measure start time
     phi_stand = MRComputeFairObjective(input_points, C_stand)
-    time_end = 0   # TODO: measure end time
-    phi_stand_time = time_end - time_start # TODO: must be in ms (integer)
+    time_end = time.perf_counter()   # measure end time
+    phi_stand_time =  int((time_end - time_start) * 1000) # must be in ms (integer)
     
     # Compute fair objective for fair centroids
-    time_start = 0 # TODO: measure start time
+    time_start = time.perf_counter() # measure start time
     phi_fair = MRComputeFairObjective(input_points, C_fair)
-    time_end = 0   # TODO: measure end time
-    phi_fair_time = time_end - time_start # TODO: must be in ms (integer)
+    time_end = time.perf_counter()   # measure end time
+    phi_fair_time = int((time_end - time_start) * 1000) # must be in ms (integer)
     
     # Print objectives
     print(f'Fair Objective with Standard Centers = {phi_stand:.4f}')
