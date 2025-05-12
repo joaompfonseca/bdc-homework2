@@ -1,0 +1,7 @@
+N = 1100000, NA = 1000000, NB = 100000
+Fair Objective with Standard Centers = 82.7281
+Fair Objective with Fair Centers = 25.1811
+Time to compute standard centers = 8470 ms
+Time to compute fair centers = 327290 ms
+Time to compute objective with standard centers = 53179 ms
+Time to compute objective with fair centers = 11704 ms
