@@ -187,6 +187,7 @@ def main(data_path, L, K, M):
     # Setup Spark
     conf = SparkConf().setAppName('G11HW2')
     sc = SparkContext(conf=conf)
+    sc.setLogLevel('ERROR')
 
     # Subdivide the input file into L random partitions
     docs = sc.textFile(data_path).repartition(numPartitions=L).cache()
@@ -235,7 +236,7 @@ def main(data_path, L, K, M):
     print(f'Time to compute objective with fair centers = {phi_fair_time} ms')
 
     # Keep the Spark Web interface alive
-    input("Press <Enter> to exit and close the Spark UI…")
+    # input("Press <Enter> to exit and close the Spark UI…")
 
 
 if __name__ == '__main__':
