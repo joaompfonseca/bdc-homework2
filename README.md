@@ -15,12 +15,13 @@ This script generates an input dataset with `N` points and `K` centroids distrib
   - `K` Number of centroids.
   > `OPTIONS` are the optional arguments
   - `-h` or `--help`: Show the help message and exit.
+  - `--output OUTPUT`: Output file path (default: print to stdout).
   - `--D D`: Number of dimensions (default: 2).
-  - `--A_group_ratio A_GROUP_RATIO`: Group A ratio  (default: 0.9).
-  - `--A_centroid_ratio A_CENTROID_RATIO`: Centroid A  ratio (default: 0.5).
-  - `--val_min VAL_MIN`: Minimum value for centroids  (default: -1).
-  - `--val_max VAL_MAX`: Maximum value for centroids  (default: 1).
-  - `--std_dev STD_DEV`: Standard deviation for Gaussian  distribution (default: 0.1).
+  - `--A_group_ratio A_GROUP_RATIO`: Group A ratio (default: 0.9).
+  - `--A_centroid_ratio A_CENTROID_RATIO`: Centroid A ratio (default: 0.5).
+  - `--val_min VAL_MIN`: Minimum value for centroids (default: -1).
+  - `--val_max VAL_MAX`: Maximum value for centroids (default: 1).
+  - `--std_dev STD_DEV`: Standard deviation for Gaussian distribution (default: 0.1).
 
 ## How to run `G11HW2.py`
 
@@ -30,8 +31,8 @@ This script implements the fair k-means clustering algorithm.
   - `data_path` is the path to the dataset. The dataset should be in the format `x1,x2,...,xn,label` with `x1,x2,...,xn` being the features coordinates (float) and `label` being the demographic group `A` or `B`.
   - `L` Number of partitions.
   - `K` Number of centroids.
-  - `M` Number of interations.
-  > `OPTIONS` are the optional arguments:
+  - `M` Number of iterations.
+  > `OPTIONS` are the optional arguments
   - `-h` or `--help`: show the help message and exit.
 
 - Run `./run.sh` in root to test the implementation on a small dataset.
