@@ -234,6 +234,9 @@ def main(data_path, L, K, M):
     print(f'Time to compute objective with standard centers = {phi_stand_time} ms')
     print(f'Time to compute objective with fair centers = {phi_fair_time} ms')
 
+    # Keep the Spark Web interface alive
+    input("Press <Enter> to exit and close the Spark UI…")
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
