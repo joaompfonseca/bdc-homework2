@@ -66,6 +66,10 @@ def final_compute(x: Tuple) -> Tuple:
     count_A, sum_A, count_B, sum_B = x
     mu_A = [v / count_A if count_A > 0 else 0.0 for v in sum_A]
     mu_B = [v / count_B if count_B > 0 else 0.0 for v in sum_B]
+    if count_A == 0:
+        mu_A = mu_B
+    elif count_B == 0:
+        mu_B = mu_A
     ell = math.dist(mu_A, mu_B)
     return (count_A, tuple(mu_A), count_B, tuple(mu_B), ell)
 
